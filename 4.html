@@ -34,7 +34,18 @@ s.parentNode.insertBefore(t,s)}(window, document,'script',
 'https://connect.facebook.net/en_US/fbevents.js');
 fbq('init', '1793515878726057');
 fbq('track', 'PageView');
-fbq('track', 'Schedule');
+// Fire the Schedule conversion ONLY for genuine post-booking arrivals.
+// The calendar's post-booking redirect must point to 4.html?booked=1.
+// sessionStorage guard prevents a page refresh from double-counting.
+(function(){
+  var booked = new URLSearchParams(window.location.search).get('booked') === '1';
+  if (!booked) return;
+  try {
+    if (sessionStorage.getItem('scheduleFired') === '1') return;
+    sessionStorage.setItem('scheduleFired', '1');
+  } catch (e) { /* storage blocked: still gate on the URL param below */ }
+  fbq('track', 'Schedule');
+})();
 </script>
 <noscript><img height="1" width="1" style="display:none"
 src="https://www.facebook.com/tr?id=1793515878726057&ev=PageView&noscript=1"
