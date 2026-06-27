@@ -93,35 +93,69 @@ src="https://www.facebook.com/tr?id=1793515878726057&ev=PageView&noscript=1"
     width: 100%;
     max-width: 1040px;
     margin: 0 auto;
-    padding: 48px 24px 0;
+    padding: 112px 24px 48px;
     text-align: center;
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
   }
 
-  /* ---------- Logo ---------- */
-  .logo {
-    width: 132px;
-    height: 132px;
-    border-radius: 20px;
-    background: #ffffff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.45);
-    margin-bottom: 52px;
-    overflow: hidden;
+  /* ---------- Brand mark (top-left, no box) ---------- */
+  .brand {
+    position: absolute;
+    top: 24px;
+    left: 30px;
+    z-index: 3;
+    height: 42px;
   }
-  .logo img { width: 100%; height: 100%; object-fit: contain; display: block; }
+  .brand img {
+    height: 100%;
+    width: auto;
+    display: block;
+    filter: drop-shadow(0 2px 10px rgba(0,0,0,0.55));
+  }
+
+  /* ---------- Optional secondary action (top-right) ---------- */
+  .top-link {
+    position: absolute;
+    top: 22px;
+    right: 24px;
+    z-index: 3;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 10px 16px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,0.22);
+    background: rgba(255,255,255,0.07);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    color: #e4e9f2;
+    font-size: 13.5px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    text-decoration: none;
+    text-shadow: 0 1px 6px rgba(0,0,0,0.45);
+    transition: background .2s ease, border-color .2s ease, color .2s ease, transform .15s ease;
+  }
+  .top-link:hover {
+    background: rgba(255,255,255,0.14);
+    border-color: rgba(255,255,255,0.45);
+    color: #fff;
+    transform: translateY(-1px);
+  }
+  .top-link .ar { font-weight: 700; }
 
   /* ---------- Hero copy ---------- */
   .eyebrow {
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 800;
     letter-spacing: 0.22em;
-    color: #ffffff;
+    text-transform: uppercase;
+    color: #3fd6a6;
     margin-bottom: 18px;
+    text-shadow: 0 1px 10px rgba(0,0,0,0.45);
   }
 
   h1 {
@@ -145,14 +179,29 @@ src="https://www.facebook.com/tr?id=1793515878726057&ev=PageView&noscript=1"
     text-shadow: 0 1px 14px rgba(0,0,0,0.5);
   }
 
+  /* ---------- Trust line ---------- */
+  .trust {
+    margin: 26px auto 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 14.5px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    color: #cdd6e6;
+    text-shadow: 0 1px 12px rgba(0,0,0,0.5);
+  }
+  .trust-ic { width: 18px; height: 18px; flex: 0 0 auto; }
+
   /* ---------- Buttons ---------- */
-  .cta-stack {
-    margin-top: 56px;
+  .cta-wrap {
+    margin-top: 34px;
     width: 100%;
-    max-width: 720px;
+    max-width: 600px;
     display: flex;
     flex-direction: column;
-    gap: 22px;
+    align-items: center;
+    gap: 18px;
   }
 
   .btn {
@@ -195,6 +244,22 @@ src="https://www.facebook.com/tr?id=1793515878726057&ev=PageView&noscript=1"
   }
   .btn .arrow svg { width: 14px; height: 14px; }
 
+  /* ---------- Secondary text link ---------- */
+  .sub-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #c2cbdc;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(194,203,220,0.4);
+    padding-bottom: 2px;
+    text-shadow: 0 1px 10px rgba(0,0,0,0.5);
+    transition: color .2s ease, border-color .2s ease;
+  }
+  .sub-link:hover { color: #fff; border-color: rgba(255,255,255,0.75); }
+
   /* ---------- Footer ---------- */
   footer {
     position: relative;
@@ -206,24 +271,32 @@ src="https://www.facebook.com/tr?id=1793515878726057&ev=PageView&noscript=1"
   }
 
   @media (max-width: 600px) {
-    .content { padding-top: 40px; }
-    .logo { margin-bottom: 40px; }
-    .cta-stack { margin-top: 44px; gap: 16px; }
+    .content { padding: 100px 20px 36px; }
     .btn { padding: 22px 20px; }
+    .brand { top: 16px; left: 16px; height: 34px; }
+    .top-link { top: 14px; right: 14px; padding: 8px 12px; font-size: 11.5px; gap: 5px; }
+    .cta-wrap { margin-top: 28px; }
+    .trust { font-size: 13px; margin-top: 22px; }
   }
 </style>
 </head>
 <body>
   <div class="page">
+
+    <!-- Brand mark (top-left, no box) -->
+    <div class="brand" aria-label="Leveleads">
+      <img src="logo-white.png" alt="Leveleads" />
+    </div>
+
+    <!-- Optional secondary action (top-right) -->
+    <a href="3.html" class="top-link">
+      Talk to the AI yourself <span class="ar" aria-hidden="true">&rarr;</span>
+    </a>
+
     <main class="content">
 
-      <!-- Logo -->
-      <div class="logo" aria-label="Leveleads">
-        <img src="logo.png" alt="Leveleads" />
-      </div>
-
       <!-- Hero -->
-      <p class="eyebrow">IT'S TIME</p>
+      <p class="eyebrow">For UK Solar Installers</p>
       <h1>Do Your Installs While The AI Books Appointments For You</h1>
       <p class="subtext">
         Our AI voice agent calls, qualifies and books your solar leads into the
@@ -231,8 +304,13 @@ src="https://www.facebook.com/tr?id=1793515878726057&ev=PageView&noscript=1"
         your diary.
       </p>
 
-      <!-- CTAs -->
-      <div class="cta-stack">
+      <p class="trust">
+        <svg class="trust-ic" viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4 10-10" stroke="#3fd6a6" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Trusted by solar installers across the UK
+      </p>
+
+      <!-- Primary CTA + secondary text link -->
+      <div class="cta-wrap">
         <a href="2.html" class="btn">
           Implement The AI Into Your Business
           <span class="arrow">
@@ -242,13 +320,8 @@ src="https://www.facebook.com/tr?id=1793515878726057&ev=PageView&noscript=1"
           </span>
         </a>
 
-        <a href="3.html" class="btn">
-          Talk To The AI Yourself
-          <span class="arrow">
-            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M9 6l6 6-6 6" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </span>
+        <a href="3.html" class="sub-link">
+          or talk to the AI yourself first <span aria-hidden="true">&rarr;</span>
         </a>
       </div>
 
