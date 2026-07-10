@@ -182,7 +182,7 @@ src="https://www.facebook.com/tr?id=1793515878726057&ev=PageView&noscript=1"
     text-shadow: 0 1px 14px rgba(0,0,0,0.5);
   }
 
-  /* ---------- VSL video (between headline and subtext) ---------- */
+  /* ---------- VSL custom player (between headline and subtext) ---------- */
   .vsl {
     position: relative;
     width: 100%;
@@ -193,17 +193,75 @@ src="https://www.facebook.com/tr?id=1793515878726057&ev=PageView&noscript=1"
     overflow: hidden;
     background: #05060a;
     box-shadow: 0 22px 55px rgba(0,0,0,0.55);
-    border: 1px solid rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.10);
+    cursor: pointer;
+    isolation: isolate;
+    -webkit-user-select: none;
+    user-select: none;
   }
   .vsl video {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    display: block;
-    object-fit: cover;
-    background: #05060a;
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    display: block; object-fit: cover; background: #05060a;
   }
+
+  /* Tap-to-unmute cue (top-center, clear of bottom captions) */
+  .vsl-unmute {
+    position: absolute;
+    top: 14px; left: 50%;
+    transform: translateX(-50%);
+    z-index: 6;
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 10px 16px 10px 13px;
+    font-family: inherit; font-size: 13.5px; font-weight: 700; letter-spacing: 0.01em;
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.30);
+    border-radius: 999px;
+    background: linear-gradient(135deg, rgba(31,91,255,0.94), rgba(63,214,166,0.94));
+    cursor: pointer;
+    white-space: nowrap;
+    -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+    animation: vslPulse 1.9s ease-out infinite;
+    transition: opacity .3s ease, transform .3s ease;
+  }
+  .vsl-unmute svg { width: 19px; height: 19px; display: block; }
+  @keyframes vslPulse {
+    0%   { box-shadow: 0 10px 28px rgba(31,91,255,0.5), 0 0 0 0 rgba(63,214,166,0.55); }
+    70%  { box-shadow: 0 10px 28px rgba(31,91,255,0.5), 0 0 0 15px rgba(63,214,166,0); }
+    100% { box-shadow: 0 10px 28px rgba(31,91,255,0.5), 0 0 0 0 rgba(63,214,166,0); }
+  }
+  .vsl.unmuted .vsl-unmute { opacity: 0; pointer-events: none; transform: translateX(-50%) scale(0.85); }
+
+  /* Controls (auto-hide, only after unmute) */
+  .vsl-controls {
+    position: absolute; left: 0; right: 0; bottom: 0; z-index: 5;
+    display: flex; align-items: center; gap: 10px;
+    padding: 26px 12px 9px;
+    background: linear-gradient(to top, rgba(0,0,0,0.72), rgba(0,0,0,0));
+    opacity: 0; transform: translateY(8px);
+    transition: opacity .25s ease, transform .25s ease;
+    pointer-events: none;
+  }
+  .vsl.show-controls .vsl-controls { opacity: 1; transform: none; pointer-events: auto; }
+  .vsl-btn {
+    background: none; border: 0; padding: 3px; margin: 0;
+    color: #fff; cursor: pointer; display: inline-flex; flex: 0 0 auto;
+    opacity: .9; transition: opacity .15s ease, transform .15s ease;
+  }
+  .vsl-btn:hover { opacity: 1; transform: scale(1.08); }
+  .vsl-btn svg { width: 20px; height: 20px; display: block; }
+  .vsl-time { color: #fff; font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; flex: 0 0 auto; text-shadow: 0 1px 3px rgba(0,0,0,.6); }
+  .vsl-track { position: relative; flex: 1 1 auto; height: 5px; border-radius: 999px; background: rgba(255,255,255,0.28); cursor: pointer; touch-action: none; }
+  .vsl-track:hover { height: 7px; }
+  .vsl-buffered { position: absolute; left: 0; top: 0; bottom: 0; width: 0; border-radius: 999px; background: rgba(255,255,255,0.25); }
+  .vsl-fill { position: absolute; left: 0; top: 0; bottom: 0; width: 0; border-radius: 999px; background: linear-gradient(90deg, #1f5bff, #3fd6a6); }
+  .vsl-knob { position: absolute; top: 50%; left: 0; width: 12px; height: 12px; border-radius: 50%; background: #fff; transform: translate(-50%, -50%); box-shadow: 0 1px 5px rgba(0,0,0,.55); opacity: 0; transition: opacity .15s ease; }
+  .vsl-track:hover .vsl-knob, .vsl.scrubbing .vsl-knob { opacity: 1; }
+
+  /* Fullscreen: show full frame, keep captions visible */
+  .vsl:fullscreen { width: 100vw; height: 100vh; max-width: none; margin: 0; border-radius: 0; border: 0; }
+  .vsl:-webkit-full-screen { width: 100vw; height: 100vh; max-width: none; margin: 0; border-radius: 0; border: 0; }
+  .vsl:fullscreen video, .vsl:-webkit-full-screen video { object-fit: contain; }
 
   /* ---------- Trust line ---------- */
   .trust {
@@ -387,16 +445,37 @@ src="https://www.facebook.com/tr?id=1793515878726057&ev=PageView&noscript=1"
         <p class="eyebrow">For UK Solar Installers</p>
         <h1>Do Your Installs While The AI Books Appointments For You</h1>
 
-        <!-- VSL -->
-        <div class="vsl">
-          <video
+        <!-- VSL (custom player) -->
+        <div class="vsl" id="vsl">
+          <video id="vslVideo"
             src="https://github.com/leveleadshere-del/1/releases/download/media-v1/home-vsl.mp4"
             poster="videos/home-vsl.jpg"
-            preload="none"
-            playsinline
-            controls
-            controlslist="nodownload"
+            preload="auto"
+            muted autoplay playsinline
+            disablepictureinpicture
+            controlslist="nodownload noremoteplayback"
             width="1920" height="1080"></video>
+
+          <button type="button" class="vsl-unmute" id="vslUnmute" aria-label="Unmute video">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M4 9v6h4l5 4V5L8 9H4z" fill="#fff"/>
+              <line x1="15.5" y1="9.5" x2="20.5" y2="14.5" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+              <line x1="20.5" y1="9.5" x2="15.5" y2="14.5" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            Tap to unmute
+          </button>
+
+          <div class="vsl-controls" id="vslControls">
+            <button type="button" class="vsl-btn" id="vslPlay" aria-label="Play or pause"></button>
+            <span class="vsl-time" id="vslTime">0:00 / 0:00</span>
+            <div class="vsl-track" id="vslTrack">
+              <div class="vsl-buffered" id="vslBuffered"></div>
+              <div class="vsl-fill" id="vslFill"></div>
+              <div class="vsl-knob" id="vslKnob"></div>
+            </div>
+            <button type="button" class="vsl-btn" id="vslMute" aria-label="Mute or unmute"></button>
+            <button type="button" class="vsl-btn" id="vslFs" aria-label="Fullscreen"></button>
+          </div>
         </div>
 
         <p class="subtext">
@@ -434,5 +513,128 @@ src="https://www.facebook.com/tr?id=1793515878726057&ev=PageView&noscript=1"
       © 2026 Leveleads — All rights reserved.
     </footer>
   </div>
+
+  <script>
+  (function(){
+    var wrap = document.getElementById('vsl');
+    if(!wrap) return;
+    var v = document.getElementById('vslVideo');
+    var unmuteBtn = document.getElementById('vslUnmute');
+    var playBtn = document.getElementById('vslPlay');
+    var muteBtn = document.getElementById('vslMute');
+    var fsBtn = document.getElementById('vslFs');
+    var track = document.getElementById('vslTrack');
+    var fill = document.getElementById('vslFill');
+    var buffered = document.getElementById('vslBuffered');
+    var knob = document.getElementById('vslKnob');
+    var timeEl = document.getElementById('vslTime');
+
+    var ICON_PLAY  = '<svg viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg>';
+    var ICON_PAUSE = '<svg viewBox="0 0 24 24" fill="#fff"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>';
+    var ICON_MUTE  = '<svg viewBox="0 0 24 24" fill="none"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="#fff"/><line x1="16" y1="9.5" x2="21" y2="14.5" stroke="#fff" stroke-width="2" stroke-linecap="round"/><line x1="21" y1="9.5" x2="16" y2="14.5" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>';
+    var ICON_VOL   = '<svg viewBox="0 0 24 24" fill="none"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="#fff"/><path d="M16 8.5a5 5 0 010 7" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>';
+    var ICON_FS    = '<svg viewBox="0 0 24 24" fill="none"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>';
+
+    playBtn.innerHTML = ICON_PAUSE;
+    muteBtn.innerHTML = ICON_MUTE;
+    fsBtn.innerHTML  = ICON_FS;
+
+    var unlocked = false;   // true once viewer has unmuted (unlocks full controls)
+    var hideTimer = null;
+
+    // Start muted autoplay (robust across browsers)
+    v.muted = true;
+    function tryAutoplay(){ if (unlocked) return; var p = v.play(); if (p && p.catch) p.catch(function(){}); }
+    tryAutoplay();
+    v.addEventListener('canplay', tryAutoplay);
+    v.addEventListener('loadeddata', tryAutoplay);
+    ['pointerdown','touchstart','keydown','scroll'].forEach(function(ev){
+      document.addEventListener(ev, function once(){ document.removeEventListener(ev, once); tryAutoplay(); }, { passive: true });
+    });
+
+    function showControls(){
+      if (!unlocked) return;
+      wrap.classList.add('show-controls');
+      if (hideTimer) clearTimeout(hideTimer);
+      if (!v.paused) hideTimer = setTimeout(function(){ wrap.classList.remove('show-controls'); }, 2500);
+    }
+
+    function unmute(){
+      unlocked = true;
+      v.muted = false;
+      try { v.currentTime = 0; } catch(e){}
+      var p = v.play(); if (p && p.catch) p.catch(function(){});
+      wrap.classList.add('unmuted');
+      muteBtn.innerHTML = ICON_VOL;
+      setTimeout(function(){ unmuteBtn.style.display = 'none'; }, 350);
+      showControls();
+    }
+
+    function togglePlay(){
+      if (v.paused) { var p = v.play(); if (p && p.catch) p.catch(function(){}); }
+      else { v.pause(); }
+    }
+
+    // Click surface: unmute (first) or play/pause (after)
+    wrap.addEventListener('click', function(e){
+      if (e.target.closest('.vsl-controls') || e.target.closest('.vsl-unmute')) return;
+      if (!unlocked) unmute(); else togglePlay();
+    });
+    unmuteBtn.addEventListener('click', function(e){ e.stopPropagation(); unmute(); });
+    playBtn.addEventListener('click', function(e){ e.stopPropagation(); togglePlay(); });
+    muteBtn.addEventListener('click', function(e){
+      e.stopPropagation();
+      v.muted = !v.muted;
+      muteBtn.innerHTML = v.muted ? ICON_MUTE : ICON_VOL;
+      showControls();
+    });
+    fsBtn.addEventListener('click', function(e){
+      e.stopPropagation();
+      var d = document;
+      if (d.fullscreenElement || d.webkitFullscreenElement) {
+        (d.exitFullscreen || d.webkitExitFullscreen).call(d);
+      } else {
+        (wrap.requestFullscreen || wrap.webkitRequestFullscreen).call(wrap);
+      }
+    });
+
+    v.addEventListener('play',  function(){ playBtn.innerHTML = ICON_PAUSE; showControls(); });
+    v.addEventListener('pause', function(){ playBtn.innerHTML = ICON_PLAY; if (unlocked){ wrap.classList.add('show-controls'); if (hideTimer) clearTimeout(hideTimer); } });
+    v.addEventListener('ended', function(){ playBtn.innerHTML = ICON_PLAY; if (unlocked) wrap.classList.add('show-controls'); });
+
+    function fmt(t){ t = Math.max(0, t || 0); var m = Math.floor(t/60), s = Math.floor(t%60); return m + ':' + (s<10?'0':'') + s; }
+    function render(){
+      var d = v.duration || 0, c = v.currentTime || 0;
+      var pct = d ? (c/d*100) : 0;
+      fill.style.width = pct + '%';
+      knob.style.left = pct + '%';
+      if (v.buffered && v.buffered.length && d) buffered.style.width = (v.buffered.end(v.buffered.length-1)/d*100) + '%';
+      timeEl.textContent = fmt(c) + ' / ' + fmt(d);
+    }
+    v.addEventListener('timeupdate', render);
+    v.addEventListener('loadedmetadata', render);
+    v.addEventListener('progress', render);
+
+    // Seek (click + drag)
+    var scrubbing = false;
+    function seekFromEvent(e){
+      var r = track.getBoundingClientRect();
+      var cx = (e.touches ? e.touches[0].clientX : e.clientX);
+      var x = (cx - r.left) / r.width;
+      x = Math.min(1, Math.max(0, x));
+      if (v.duration) { v.currentTime = x * v.duration; render(); }
+    }
+    track.addEventListener('pointerdown', function(e){ e.stopPropagation(); scrubbing = true; wrap.classList.add('scrubbing'); seekFromEvent(e); if (track.setPointerCapture) try{ track.setPointerCapture(e.pointerId); }catch(err){} });
+    track.addEventListener('pointermove', function(e){ if (scrubbing) seekFromEvent(e); });
+    track.addEventListener('pointerup',   function(e){ if (scrubbing){ scrubbing = false; wrap.classList.remove('scrubbing'); showControls(); } });
+    track.addEventListener('click', function(e){ e.stopPropagation(); });
+
+    ['mousemove','pointermove','touchstart'].forEach(function(ev){
+      wrap.addEventListener(ev, function(){ showControls(); }, { passive: true });
+    });
+
+    render();
+  })();
+  </script>
 </body>
 </html>
