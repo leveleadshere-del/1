@@ -205,32 +205,40 @@ src="https://www.facebook.com/tr?id=1793515878726057&ev=PageView&noscript=1"
     display: block; object-fit: cover; background: #05060a;
   }
 
-  /* Tap-to-unmute cue (top-center, clear of bottom captions) */
+  /* Tap-to-unmute overlay (covers the centre, semi-transparent, dismiss on click) */
   .vsl-unmute {
     position: absolute;
-    top: 14px; left: 50%;
-    transform: translateX(-50%);
+    inset: 0;
     z-index: 6;
-    display: inline-flex; align-items: center; gap: 8px;
-    padding: 10px 16px 10px 13px;
-    font-family: inherit; font-size: 13.5px; font-weight: 700; letter-spacing: 0.01em;
-    color: #fff;
-    border: 1px solid rgba(255,255,255,0.30);
-    border-radius: 999px;
-    background: linear-gradient(135deg, rgba(31,91,255,0.94), rgba(63,214,166,0.94));
-    cursor: pointer;
-    white-space: nowrap;
-    -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
-    animation: vslPulse 1.9s ease-out infinite;
-    transition: opacity .3s ease, transform .3s ease;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 13px;
+    margin: 0; padding: 0; border: 0;
+    background: rgba(5,11,28,0.44);
+    -webkit-backdrop-filter: blur(1.5px); backdrop-filter: blur(1.5px);
+    color: #fff; font-family: inherit; cursor: pointer;
+    transition: opacity .35s ease;
   }
-  .vsl-unmute svg { width: 19px; height: 19px; display: block; }
+  .vsl-unmute-circle {
+    width: clamp(58px, 16vw, 82px); height: clamp(58px, 16vw, 82px);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(31,91,255,0.6);
+    border: 2px solid rgba(255,255,255,0.85);
+    animation: vslPulse 1.7s ease-out infinite;
+  }
+  .vsl-unmute-circle svg { width: 44%; height: 44%; display: block; }
+  .vsl-unmute-label {
+    font-size: clamp(13px, 3.4vw, 15px); font-weight: 800; letter-spacing: 0.02em;
+    padding: 6px 15px; border-radius: 999px;
+    background: rgba(0,0,0,0.42);
+    -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px);
+    text-shadow: 0 2px 10px rgba(0,0,0,0.6);
+  }
   @keyframes vslPulse {
-    0%   { box-shadow: 0 10px 28px rgba(31,91,255,0.5), 0 0 0 0 rgba(63,214,166,0.55); }
-    70%  { box-shadow: 0 10px 28px rgba(31,91,255,0.5), 0 0 0 15px rgba(63,214,166,0); }
-    100% { box-shadow: 0 10px 28px rgba(31,91,255,0.5), 0 0 0 0 rgba(63,214,166,0); }
+    0%   { box-shadow: 0 0 0 0 rgba(63,214,166,0.55); }
+    70%  { box-shadow: 0 0 0 22px rgba(63,214,166,0); }
+    100% { box-shadow: 0 0 0 0 rgba(63,214,166,0); }
   }
-  .vsl.unmuted .vsl-unmute { opacity: 0; pointer-events: none; transform: translateX(-50%) scale(0.85); }
+  .vsl.unmuted .vsl-unmute { opacity: 0; pointer-events: none; }
 
   /* Controls (auto-hide, only after unmute) */
   .vsl-controls {
@@ -453,16 +461,18 @@ src="https://www.facebook.com/tr?id=1793515878726057&ev=PageView&noscript=1"
             preload="auto"
             muted autoplay playsinline
             disablepictureinpicture
-            controlslist="nodownload noremoteplayback"
+            controlslist="nodownload noremoteplayback nofullscreen noplaybackrate"
             width="1920" height="1080"></video>
 
           <button type="button" class="vsl-unmute" id="vslUnmute" aria-label="Unmute video">
-            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M4 9v6h4l5 4V5L8 9H4z" fill="#fff"/>
-              <line x1="15.5" y1="9.5" x2="20.5" y2="14.5" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
-              <line x1="20.5" y1="9.5" x2="15.5" y2="14.5" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
-            </svg>
-            Tap to unmute
+            <span class="vsl-unmute-circle">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M4 9v6h4l5 4V5L8 9H4z" fill="#fff"/>
+                <line x1="15.5" y1="9.5" x2="20.5" y2="14.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/>
+                <line x1="20.5" y1="9.5" x2="15.5" y2="14.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/>
+              </svg>
+            </span>
+            <span class="vsl-unmute-label">Tap to unmute</span>
           </button>
 
           <div class="vsl-controls" id="vslControls">
@@ -474,7 +484,6 @@ src="https://www.facebook.com/tr?id=1793515878726057&ev=PageView&noscript=1"
               <div class="vsl-knob" id="vslKnob"></div>
             </div>
             <button type="button" class="vsl-btn" id="vslMute" aria-label="Mute or unmute"></button>
-            <button type="button" class="vsl-btn" id="vslFs" aria-label="Fullscreen"></button>
           </div>
         </div>
 
@@ -522,7 +531,6 @@ src="https://www.facebook.com/tr?id=1793515878726057&ev=PageView&noscript=1"
     var unmuteBtn = document.getElementById('vslUnmute');
     var playBtn = document.getElementById('vslPlay');
     var muteBtn = document.getElementById('vslMute');
-    var fsBtn = document.getElementById('vslFs');
     var track = document.getElementById('vslTrack');
     var fill = document.getElementById('vslFill');
     var buffered = document.getElementById('vslBuffered');
@@ -533,11 +541,9 @@ src="https://www.facebook.com/tr?id=1793515878726057&ev=PageView&noscript=1"
     var ICON_PAUSE = '<svg viewBox="0 0 24 24" fill="#fff"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>';
     var ICON_MUTE  = '<svg viewBox="0 0 24 24" fill="none"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="#fff"/><line x1="16" y1="9.5" x2="21" y2="14.5" stroke="#fff" stroke-width="2" stroke-linecap="round"/><line x1="21" y1="9.5" x2="16" y2="14.5" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>';
     var ICON_VOL   = '<svg viewBox="0 0 24 24" fill="none"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="#fff"/><path d="M16 8.5a5 5 0 010 7" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>';
-    var ICON_FS    = '<svg viewBox="0 0 24 24" fill="none"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>';
 
     playBtn.innerHTML = ICON_PAUSE;
     muteBtn.innerHTML = ICON_MUTE;
-    fsBtn.innerHTML  = ICON_FS;
 
     var unlocked = false;   // true once viewer has unmuted (unlocks full controls)
     var hideTimer = null;
@@ -588,16 +594,6 @@ src="https://www.facebook.com/tr?id=1793515878726057&ev=PageView&noscript=1"
       muteBtn.innerHTML = v.muted ? ICON_MUTE : ICON_VOL;
       showControls();
     });
-    fsBtn.addEventListener('click', function(e){
-      e.stopPropagation();
-      var d = document;
-      if (d.fullscreenElement || d.webkitFullscreenElement) {
-        (d.exitFullscreen || d.webkitExitFullscreen).call(d);
-      } else {
-        (wrap.requestFullscreen || wrap.webkitRequestFullscreen).call(wrap);
-      }
-    });
-
     v.addEventListener('play',  function(){ playBtn.innerHTML = ICON_PAUSE; showControls(); });
     v.addEventListener('pause', function(){ playBtn.innerHTML = ICON_PLAY; if (unlocked){ wrap.classList.add('show-controls'); if (hideTimer) clearTimeout(hideTimer); } });
     v.addEventListener('ended', function(){ playBtn.innerHTML = ICON_PLAY; if (unlocked) wrap.classList.add('show-controls'); });
