@@ -182,6 +182,29 @@ src="https://www.facebook.com/tr?id=1793515878726057&ev=PageView&noscript=1"
     text-shadow: 0 1px 14px rgba(0,0,0,0.5);
   }
 
+  /* ---------- VSL video (between headline and subtext) ---------- */
+  .vsl {
+    position: relative;
+    width: 100%;
+    max-width: 560px;
+    margin: 26px auto 4px;
+    aspect-ratio: 16 / 9;
+    border-radius: 14px;
+    overflow: hidden;
+    background: #05060a;
+    box-shadow: 0 22px 55px rgba(0,0,0,0.55);
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  .vsl video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    background: #05060a;
+  }
+
   /* ---------- Trust line ---------- */
   .trust {
     margin: 26px auto 0;
@@ -363,6 +386,19 @@ src="https://www.facebook.com/tr?id=1793515878726057&ev=PageView&noscript=1"
         <!-- Hero -->
         <p class="eyebrow">For UK Solar Installers</p>
         <h1>Do Your Installs While The AI Books Appointments For You</h1>
+
+        <!-- VSL -->
+        <div class="vsl">
+          <video
+            src="https://github.com/leveleadshere-del/1/releases/download/media-v1/home-vsl.mp4"
+            poster="videos/home-vsl.jpg"
+            preload="none"
+            playsinline
+            controls
+            controlslist="nodownload"
+            width="1920" height="1080"></video>
+        </div>
+
         <p class="subtext">
           Our AI voice agent calls, qualifies and books your solar leads into the
           calendar — automatically, around the clock. You stay on the roof. It fills
