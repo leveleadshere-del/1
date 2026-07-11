@@ -212,8 +212,7 @@ src="https://www.facebook.com/tr?id=1793515878726057&ev=PageView&noscript=1"
     z-index: 6;
     display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 13px;
     margin: 0; padding: 0; border: 0;
-    background: rgba(5,11,28,0.44);
-    -webkit-backdrop-filter: blur(1.5px); backdrop-filter: blur(1.5px);
+    background: rgba(5,11,28,0.5);
     color: #fff; font-family: inherit; cursor: pointer;
     transition: opacity .35s ease;
   }
@@ -229,8 +228,7 @@ src="https://www.facebook.com/tr?id=1793515878726057&ev=PageView&noscript=1"
   .vsl-unmute-label {
     font-size: clamp(13px, 3.4vw, 15px); font-weight: 800; letter-spacing: 0.02em;
     padding: 6px 15px; border-radius: 999px;
-    background: rgba(0,0,0,0.42);
-    -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px);
+    background: rgba(0,0,0,0.55);
     text-shadow: 0 2px 10px rgba(0,0,0,0.6);
   }
   @keyframes vslPulse {
@@ -484,6 +482,7 @@ src="https://www.facebook.com/tr?id=1793515878726057&ev=PageView&noscript=1"
               <div class="vsl-knob" id="vslKnob"></div>
             </div>
             <button type="button" class="vsl-btn" id="vslMute" aria-label="Mute or unmute"></button>
+            <button type="button" class="vsl-btn" id="vslFs" aria-label="Fullscreen"></button>
           </div>
         </div>
 
@@ -531,6 +530,7 @@ src="https://www.facebook.com/tr?id=1793515878726057&ev=PageView&noscript=1"
     var unmuteBtn = document.getElementById('vslUnmute');
     var playBtn = document.getElementById('vslPlay');
     var muteBtn = document.getElementById('vslMute');
+    var fsBtn = document.getElementById('vslFs');
     var track = document.getElementById('vslTrack');
     var fill = document.getElementById('vslFill');
     var buffered = document.getElementById('vslBuffered');
@@ -541,9 +541,12 @@ src="https://www.facebook.com/tr?id=1793515878726057&ev=PageView&noscript=1"
     var ICON_PAUSE = '<svg viewBox="0 0 24 24" fill="#fff"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>';
     var ICON_MUTE  = '<svg viewBox="0 0 24 24" fill="none"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="#fff"/><line x1="16" y1="9.5" x2="21" y2="14.5" stroke="#fff" stroke-width="2" stroke-linecap="round"/><line x1="21" y1="9.5" x2="16" y2="14.5" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>';
     var ICON_VOL   = '<svg viewBox="0 0 24 24" fill="none"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="#fff"/><path d="M16 8.5a5 5 0 010 7" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>';
+    var ICON_FS    = '<svg viewBox="0 0 24 24" fill="none"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>';
+    var ICON_FS_EXIT = '<svg viewBox="0 0 24 24" fill="none"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>';
 
     playBtn.innerHTML = ICON_PAUSE;
     muteBtn.innerHTML = ICON_MUTE;
+    fsBtn.innerHTML  = ICON_FS;
 
     var unlocked = false;   // true once viewer has unmuted (unlocks full controls)
     var hideTimer = null;
@@ -594,6 +597,23 @@ src="https://www.facebook.com/tr?id=1793515878726057&ev=PageView&noscript=1"
       muteBtn.innerHTML = v.muted ? ICON_MUTE : ICON_VOL;
       showControls();
     });
+    fsBtn.addEventListener('click', function(e){
+      e.stopPropagation();
+      var d = document;
+      if (d.fullscreenElement || d.webkitFullscreenElement) {
+        (d.exitFullscreen || d.webkitExitFullscreen).call(d);
+      } else if (wrap.requestFullscreen) {
+        wrap.requestFullscreen();            // desktop: fullscreen the wrapper -> keeps custom controls (no native skip)
+      } else if (wrap.webkitRequestFullscreen) {
+        wrap.webkitRequestFullscreen();
+      } else if (v.webkitEnterFullscreen) {
+        v.webkitEnterFullscreen();           // iOS fallback: native player (skip is unavoidable there)
+      }
+      showControls();
+    });
+    function syncFsIcon(){ fsBtn.innerHTML = (document.fullscreenElement || document.webkitFullscreenElement) ? ICON_FS_EXIT : ICON_FS; }
+    document.addEventListener('fullscreenchange', syncFsIcon);
+    document.addEventListener('webkitfullscreenchange', syncFsIcon);
     v.addEventListener('play',  function(){ playBtn.innerHTML = ICON_PAUSE; showControls(); });
     v.addEventListener('pause', function(){ playBtn.innerHTML = ICON_PLAY; if (unlocked){ wrap.classList.add('show-controls'); if (hideTimer) clearTimeout(hideTimer); } });
     v.addEventListener('ended', function(){ playBtn.innerHTML = ICON_PLAY; if (unlocked) wrap.classList.add('show-controls'); });
